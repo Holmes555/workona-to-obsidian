@@ -25,7 +25,7 @@ Description: ${description ?? "Not provided"}
 
 - Install it through community plugins
 - Go to Workona to generate JSON file with all your data
-- In Workona To Obsidian plugin settings choose JSON file or copy/paste the file data into text area
+- In Workona To Obsidian plugin's settings choose JSON file or copy/paste the file data into the text area
 - Choose if you want to override old files with the same name
 - Specify the root folder for imported files
 - Run the import
@@ -34,6 +34,9 @@ Description: ${description ?? "Not provided"}
 ## Note
 
 Workona To Obsidian is still in early stage as I'm doing it on my free time for my use. 
-On this stage it will only import resources, I'm planing to add tabs, notes and tasks transfer as well.
+On this stage it will only import resources, but I'm planing to add tabs, notes and tasks transfer as well.
+
 If you want to support me: [ko-fi](https://ko-fi.com/holmes555)
+
+
 Feel free to open an issue or contribute.
