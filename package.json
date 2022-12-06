@@ -1,7 +1,7 @@
 {
 	"name": "workona-to-obsidian-plugin",
-	"version": "1.0.0",
-	"description": "Plug-in for Obsidian.md which will import Workona json file. (https://github.com/Holmes555/workona-to-obsidian)",
+	"version": "0.1.0",
+	"description": "Import Workona resources through generated JSON file. (https://github.com/Holmes555/workona-to-obsidian)",
 	"main": "main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
