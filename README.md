@@ -36,7 +36,7 @@ Description: ${description ?? "Not provided"}
 Workona To Obsidian is still in early stage as I'm doing it on my free time for my use. 
 On this stage it will only import resources, but I'm planing to add tabs, notes and tasks transfer as well.
 
-If you want to support me: [ko-fi](https://ko-fi.com/holmes555)
+If you want to support me: [ko-fi](https://ko-fi.com/holmes555) or directly to [PayPal](https://paypal.me/holmes555)
 
 
 Feel free to open an issue or contribute.
