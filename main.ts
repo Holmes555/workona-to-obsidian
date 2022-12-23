@@ -104,7 +104,8 @@ export default class WorkonaToObsidian extends Plugin {
 						let body = `# ${title}
 
 ---
-Tags: #Workona, #${workspaceSectionTitle.replace(' ', '')}, #${workspaceSubSectionTitle.replace(' ', '')}, #${resourceSectionTitle.replace(' ', '')}
+
+Tags: #Workona #${workspaceSectionTitle.replace(' ', '')} #${workspaceSubSectionTitle.replace(' ', '')} #${resourceSectionTitle.replace(' ', '')}
 
 ---
 
