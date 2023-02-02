@@ -40,4 +40,5 @@ On this stage it will only import resources, but I'm planing to add tabs, notes 
 If you want to support me: [ko-fi](https://ko-fi.com/holmes555) or directly to [PayPal](https://paypal.me/holmes555)
 
 
-Feel free to open an issue or contribute.
+Feel free to open an issue or contribute.  
+https://github.com/Holmes555/workona-to-obsidian
