@@ -1,5 +1,7 @@
 import { App, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
 
+const Handlebars = require("handlebars");
+
 
 const WORKONA_USER = "User"
 const WORKONA_WORKSPACES = "Workspaces"
@@ -69,7 +71,22 @@ export default class WorkonaToObsidian extends Plugin {
 		}
 	}
 
-	async generateNotes(objdata:Object, destFolder:string, overwrite:boolean) {
+	async getBaseTemplateText() {
+		return `---
+date created: {{date}}
+date modified: {{date}}
+tags: #Workona #{{workspaceSectionTitleTag}} #{{workspaceSubSectionTitleTag}} #{{resourceSectionTitleTag}}
+---
+
+# {{title}}
+
+Source url: {{url}}
+
+Description: {{description}}
+`;
+	}
+
+	async generateNotes(objdata:Object, templateFile:File, destFolder:string, overwrite:boolean) {
 		console.log(`generateNotes('${destFolder}', ovewrite='${overwrite}')`);
 
 		// Save current settings
@@ -101,18 +118,15 @@ export default class WorkonaToObsidian extends Plugin {
 						const description = resource[WORKONA_DESCRIPTION as keyof Object];
 						const url = resource[WORKONA_URL as keyof Object];
 
-						let body = `# ${title}
+						let templateText = await this.getBaseTemplateText();
+						if (templateFile) {
+							templateText = await templateFile.text();
+						}
+						var template = Handlebars.compile(templateText);
+						let body = template({title: title, date: new Date().toLocaleTimeString('en-us', { weekday:"long", year:"numeric", month:"short", day:"numeric", hour12: false}), 
+											workspaceSectionTitleTag: workspaceSectionTitle.replace(' ', ''), workspaceSubSectionTitleTag: workspaceSubSectionTitle.replace(' ', ''), 
+											resourceSectionTitleTag: resourceSectionTitle.replace(' ', ''), url: url, description: description ?? "Not provided"});
 
----
-
-Tags: #Workona #${workspaceSectionTitle.replace(' ', '')} #${workspaceSubSectionTitle.replace(' ', '')} #${resourceSectionTitle.replace(' ', '')}
-
----
-
-Source url: ${url}
-
-Description: ${description ?? "Not provided"} 
-`;
 
 						// Delete the old version, if it exists
 						let exist = this.app.vault.getAbstractFileByPath(filename);
@@ -175,6 +189,15 @@ class WorkonaToObsidianSettingTab extends PluginSettingTab {
 			  columns: "20"
 			}
 	 	});
+
+		 const templateSetting = new Setting(containerEl).setName("Choose template Markdown file").setDesc("Choose template (Handlebars) Markdown file");
+		 const inputTemplateFile = templateSetting.controlEl.createEl("input", {
+			   attr: {
+				 type: "file",
+				 multiple: false,
+				 accept: ".md",
+			   }
+		 });
 	
 	    const overwriteSetting = new Setting(containerEl).setName("Overwrite existing Notes").setDesc("When ticked, existing Notes with a matching name will be overwritten by entries in the supplied JSON file. Otherwise will be ignored");
     	const inputOverwriteField = overwriteSetting.controlEl.createEl("input", {
@@ -198,6 +221,11 @@ class WorkonaToObsidianSettingTab extends PluginSettingTab {
 			.addButton(button => button
 				.setButtonText("IMPORT")
 				.onClick(async (value) => {
+					const templateFiles = inputTemplateFile.files;
+					let templateFile = null;
+					if (templateFiles) {
+						templateFile = templateFiles[0];
+					}
 					let text = inputJsonText.value;
 					if (text.length == 0) {
 						const jsonFiles = inputJsonFile.files;
@@ -210,11 +238,11 @@ class WorkonaToObsidianSettingTab extends PluginSettingTab {
 							console.log(`Processing input file ${jsonFiles[i].name}`);
 							text = await jsonFiles[i].text();
 							let objdata:Object = JSON.parse(text);
-							await this.handler.call(this.caller, objdata, inputFolderName.value, inputOverwriteField.checked);
+							await this.handler.call(this.caller, objdata, templateFile, inputFolderName.value, inputOverwriteField.checked);
 						}
 					} else {
 						let objdata:Object = JSON.parse(text);
-						await this.handler.call(this.caller, objdata, inputFolderName.value, inputOverwriteField.checked);
+						await this.handler.call(this.caller, objdata, templateFile, inputFolderName.value, inputOverwriteField.checked);
 					}
 					new Notice("Import Finished");
 				}));

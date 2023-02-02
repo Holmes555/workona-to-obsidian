@@ -7,19 +7,24 @@
 
 ## Instructions
 
-This plugin allow you to import all the resources from you Workona generated JSON file. It will create the same folder structure as in your workspaces and resource sections. For each resource it will create a new .md note which implements next template:
+This plugin allow you to import all the resources from you Workona generated JSON file. It will create the same folder structure as in your workspaces and resource sections. For each resource it will create a new .md note which implements provided by you template or default one:
 
 ```
-# ${title}
-
 ---
-Tags: #Workona, #${workspaceSectionTitle.replace(' ', '')}, #${workspaceSubSectionTitle.replace(' ', '')}, #${resourceSectionTitle.replace(' ', '')}
-
+date created: {{date}}
+date modified: {{date}}
+tags: #Workona #{{workspaceSectionTitleTag}} #{{workspaceSubSectionTitleTag}} #{{resourceSectionTitleTag}}
 ---
 
-Source url: ${url}
+# {{title}}
 
-Description: ${description ?? "Not provided"} 
+Source url: {{url}}
+
+Description: {{description}}
+```
+If you are specifying your own template, you could choose from these variables:
+```
+[title, date, workspaceSectionTitleTag, workspaceSubSectionTitleTag, resourceSectionTitleTag, url, description]
 ```
 
 ## How to use
@@ -27,10 +32,15 @@ Description: ${description ?? "Not provided"}
 - Install it through community plugins
 - Go to Workona to generate JSON file with all your data
 - In Workona To Obsidian plugin's settings choose JSON file or copy/paste the file data into the text area
+- You could choose template .md file, which should be a [Handlebars template file](https://handlebarsjs.com/guide/#what-is-handlebars).
 - Choose if you want to override old files with the same name
 - Specify the root folder for imported files
 - Run the import
 - You are breathtaking!
+
+## Changelog
+
+**[0.1.3]** - Added ability to use custom template .md file for importing with your formatting.
 
 ## Note
 
@@ -38,7 +48,6 @@ Workona To Obsidian is still in early stage as I'm doing it on my free time for 
 On this stage it will only import resources, but I'm planing to add tabs, notes and tasks transfer as well.
 
 If you want to support me: [ko-fi](https://ko-fi.com/holmes555) or directly to [PayPal](https://paypal.me/holmes555)
-
 
 Feel free to open an issue or contribute.  
 https://github.com/Holmes555/workona-to-obsidian
