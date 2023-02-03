@@ -2,7 +2,7 @@
 
 [![ko-fi](https://img.shields.io/badge/Ko--Fi-holmes555-success)](https://ko-fi.com/holmes555?style=flat)
 [![paypal](https://img.shields.io/badge/Paypal-holmes555-success)](https://paypal.me/holmes555)
-![Latest Release Download Count](https://img.shields.io/github/downloads/Holmes555/workona-to-obsidian/latest/main.js?style=flat)
+![Latest Release Download Count](https://img.shields.io/github/downloads/Holmes555/workona-to-obsidian/main.js?style=flat)
 ![GitHub License](https://img.shields.io/github/license/Holmes555/workona-to-obsidian?style=flat)
 
 ## Instructions
