@@ -13,7 +13,7 @@ This plugin allow you to import all the resources from you Workona generated JSO
 ---
 date created: {{date}}
 date modified: {{date}}
-tags: #Workona #{{workspaceSectionTitleTag}} #{{workspaceSubSectionTitleTag}} #{{resourceSectionTitleTag}}
+tags: Workona, {{workspaceSectionTitleTag}}, {{workspaceSubSectionTitleTag}}, {{resourceSectionTitleTag}}
 ---
 
 # {{title}}
@@ -40,7 +40,8 @@ If you are specifying your own template, you could choose from these variables:
 
 ## Changelog
 
-**[0.1.3]** - Added ability to use custom template .md file for importing with your formatting.
+**[0.1.3]** - Added ability to use custom template .md file for importing with your formatting.  
+**[0.1.4]** - Format default template, to make proper tags. Replace "|" in the file name.
 
 ## Note
 

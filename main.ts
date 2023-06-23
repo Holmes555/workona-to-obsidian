@@ -53,7 +53,7 @@ export default class WorkonaToObsidian extends Plugin {
 	}
 
 	validFilename(name:string) {
-		const regexp = /[`~!@#$%^&*\=?;:'"<>\{\}\[\]\\\/]/gi;
+		const regexp = /[`~|!@#$%^&*\=?;:'"<>\{\}\[\]\\\/]/gi;
 		return name.replace(regexp,'_');
 	}
 
@@ -75,7 +75,7 @@ export default class WorkonaToObsidian extends Plugin {
 		return `---
 date created: {{date}}
 date modified: {{date}}
-tags: #Workona #{{workspaceSectionTitleTag}} #{{workspaceSubSectionTitleTag}} #{{resourceSectionTitleTag}}
+tags: Workona, {{workspaceSectionTitleTag}}, {{workspaceSubSectionTitleTag}}, {{resourceSectionTitleTag}}
 ---
 
 # {{title}}
