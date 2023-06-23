@@ -41,7 +41,8 @@ If you are specifying your own template, you could choose from these variables:
 ## Changelog
 
 **[0.1.3]** - Added ability to use custom template .md file for importing with your formatting.  
-**[0.1.4]** - Format default template, to make proper tags. Replace "|" in the file name.
+**[0.1.4]** - Format default template, to make proper tags. Replace "|" in the file name.  
+**[0.2.0]** - Added ability to compare Workona JSON files and export only new resources, that way you could update Obsidian without duplicates.
 
 ## Note
 
