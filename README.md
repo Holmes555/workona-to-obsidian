@@ -47,7 +47,7 @@ If you are specifying your own template, you could choose from these variables:
 ## Note
 
 Workona To Obsidian is still in early stage as I'm doing it on my free time for my use. 
-On this stage it will only import resources, but I'm planing to add tabs, notes and tasks transfer as well.
+On this stage it will only import resources, but I'm planning to add tabs, notes and tasks transfer as well.
 
 If you want to support me: [ko-fi](https://ko-fi.com/holmes555) or directly to [PayPal](https://paypal.me/holmes555)
 
