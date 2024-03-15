@@ -1,6 +1,6 @@
 {
 	"name": "workona-to-obsidian-plugin",
-	"version": "0.2.0",
+	"version": "0.2.1",
 	"description": "Import Workona resources through generated JSON file. (https://github.com/Holmes555/workona-to-obsidian)",
 	"main": "main.js",
 	"scripts": {
