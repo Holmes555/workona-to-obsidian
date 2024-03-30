@@ -71,7 +71,7 @@ export default class WorkonaToObsidian extends Plugin {
 		}
 	}
 
-	async getBaseTemplateText() {
+	async getResourceTemplateText() {
 		return `---
 date created: {{date}}
 date modified: {{date}}
@@ -86,7 +86,20 @@ Description: {{description}}
 `;
 	}
 
-	async generateNotes(objdata: Object, objdataOld: Object, templateFile: File, destFolder: string, overwrite: boolean) {
+	async getTabTemplateText() {
+		return `---
+date created: {{date}}
+date modified: {{date}}
+tags: Workona, {{workspaceSectionTitleTag}}, {{workspaceSubSectionTitleTag}}
+---
+
+# {{title}}
+
+Source url: {{url}}
+`;
+	}
+
+	async generateNotes(objdata: Object, objdataOld: Object, isResource: boolean, templateResourceFile: File, isTab: boolean, templateTabFile: File, destFolder: string, overwrite: boolean) {
 		console.log(`generateNotes('${destFolder}', ovewrite='${overwrite}')`);
 
 		// Save current settings
@@ -98,48 +111,98 @@ Description: {{description}}
 		const workspacesPath = destFolder + '/' + WORKONA_WORKSPACES;
 		await this.createFolder(workspacesPath);
 
-		let worspaceSectionOldBase = objdataOld[WORKONA_WORKSPACES as keyof Object] ?? {};
-		for (let [key, worspaceSection] of Object.entries(objdata[WORKONA_WORKSPACES as keyof Object])) {
-			let worspaceSectionOld = worspaceSectionOldBase[key as keyof Object] ?? {};
-			const workspaceSectionTitle = worspaceSection[WORKONA_TITLE as keyof Object];
+		let templateResourceText = await this.getResourceTemplateText();
+		if (templateResourceFile) {
+			templateResourceText = await templateResourceFile.text();
+		}
+		var templateResource = Handlebars.compile(templateResourceText);
+
+		let templateTabText = await this.getTabTemplateText();
+		if (templateTabFile) {
+			templateTabText = await templateTabFile.text();
+		}
+		var templateTab = Handlebars.compile(templateTabText);
+
+		let workspaceSectionOldBase = objdataOld[WORKONA_WORKSPACES as keyof Object] ?? {};
+		for (let [key, workspaceSection] of Object.entries(objdata[WORKONA_WORKSPACES as keyof Object])) {
+			let workspaceSectionOld = workspaceSectionOldBase[key as keyof Object] ?? {};
+			const workspaceSectionTitle = workspaceSection[WORKONA_TITLE as keyof Object];
 			const workspaceSectionPath = workspacesPath + '/' + workspaceSectionTitle;
 			await this.createFolder(workspaceSectionPath);
 
-			let worspaceSubSectionOldBase = worspaceSectionOld[WORKONA_WORKSPACES.toLowerCase() as keyof Object] ?? {};
-			for (let [key, worspaceSubSection] of Object.entries(
-				worspaceSection[WORKONA_WORKSPACES.toLowerCase() as keyof Object],
+			let workspaceSubSectionOldBase = workspaceSectionOld[WORKONA_WORKSPACES.toLowerCase() as keyof Object] ?? {};
+			for (let [key, workspaceSubSection] of Object.entries(
+				workspaceSection[WORKONA_WORKSPACES.toLowerCase() as keyof Object],
 			)) {
-				let worspaceSubSectionOld = worspaceSubSectionOldBase[key as keyof Object] ?? {};
-				const workspaceSubSectionTitle = worspaceSubSection[WORKONA_TITLE as keyof Object];
+				let workspaceSubSectionOld = workspaceSubSectionOldBase[key as keyof Object] ?? {};
+				const workspaceSubSectionTitle = workspaceSubSection[WORKONA_TITLE as keyof Object];
 				const workspaceSubSectionPath = workspaceSectionPath + '/' + workspaceSubSectionTitle;
 				await this.createFolder(workspaceSubSectionPath);
 
-				let resourcesSectionOldBase = worspaceSubSectionOld[WORKONA_RESOURCES as keyof Object] ?? {};
-				for (let [key, resourcesSection] of Object.entries(worspaceSubSection[WORKONA_RESOURCES as keyof Object])) {
-					let resourcesSectionOld = resourcesSectionOldBase[key as keyof Object] ?? {};
-					const resourceSectionTitle = resourcesSection[WORKONA_TITLE as keyof Object];
+				if (isResource) {
+					const resourcesFolder = WORKONA_RESOURCES.charAt(0).toUpperCase() + WORKONA_RESOURCES.slice(1);
+					const resourcesPath = workspaceSubSectionPath + '/' + resourcesFolder;
+					await this.createFolder(resourcesPath)
+					let resourcesSectionOldBase = workspaceSubSectionOld[WORKONA_RESOURCES as keyof Object] ?? {};
+					for (let [key, resourcesSection] of Object.entries(workspaceSubSection[WORKONA_RESOURCES as keyof Object])) {
+						let resourcesSectionOld = resourcesSectionOldBase[key as keyof Object] ?? {};
+						const resourceSectionTitle = resourcesSection[WORKONA_TITLE as keyof Object];
 
-					let resourceOldBase = resourcesSectionOld[WORKONA_RESOURCES as keyof Object] ?? {};
-					for (let [key, resource] of Object.entries(resourcesSection[WORKONA_RESOURCES as keyof Object])) {
-						let resourceOld = resourceOldBase[key as keyof Object] ?? {};
-						const title = resource[WORKONA_TITLE as keyof Object];
-						const filename = workspaceSubSectionPath + '/' + this.validFilename(title) + '.md';
+						let resourceOldBase = resourcesSectionOld[WORKONA_RESOURCES as keyof Object] ?? {};
+						for (let [key, resource] of Object.entries(resourcesSection[WORKONA_RESOURCES as keyof Object])) {
+							let resourceOld = resourceOldBase[key as keyof Object] ?? {};
+							const title = resource[WORKONA_TITLE as keyof Object];
+							const filename = resourcesPath + '/' + this.validFilename(title) + '.md';
 
-						const description = resource[WORKONA_DESCRIPTION as keyof Object];
-						const url = resource[WORKONA_URL as keyof Object];
-						const urlOld = resourceOld[WORKONA_URL as keyof Object] ?? null;
+							const description = resource[WORKONA_DESCRIPTION as keyof Object];
+							const url = resource[WORKONA_URL as keyof Object];
+							const urlOld = resourceOld[WORKONA_URL as keyof Object] ?? null;
+
+							if (url === urlOld) {
+								console.log(`Url: ${url}.\n Old url: ${urlOld}`);
+								continue;
+							}
+
+							let body = templateResource({
+								title: title,
+								date: new Date().toLocaleTimeString('en-us', {
+									weekday: 'long',
+									year: 'numeric',
+									month: 'short',
+									day: 'numeric',
+									hour12: false,
+								}),
+								workspaceSectionTitleTag: workspaceSectionTitle.replace(' ', ''),
+								workspaceSubSectionTitleTag: workspaceSubSectionTitle.replace(' ', ''),
+								resourceSectionTitleTag: resourceSectionTitle.replace(' ', ''),
+								url: url,
+								description: description ?? 'Not provided',
+							});
+
+							await this.writeFile(body, filename, overwrite);
+						}
+					}
+				}
+
+				if (isTab) {
+					const tabFolder = WORKONA_TABS.charAt(0).toUpperCase() + WORKONA_TABS.slice(1);
+					const tabPath = workspaceSubSectionPath + '/' + tabFolder;
+					await this.createFolder(tabPath)
+					let tabOldBase = workspaceSubSectionOld[WORKONA_TABS as keyof Object] ?? {};
+					for (let [key, tab] of Object.entries(workspaceSubSection[WORKONA_TABS as keyof Object])) {
+						let tabOld = tabOldBase[key as keyof Object] ?? {};
+						const title = tab[WORKONA_TITLE as keyof Object];
+						const filename = tabPath + '/' + this.validFilename(title) + '.md';
+
+						const url = tab[WORKONA_URL as keyof Object];
+						const urlOld = tabOld[WORKONA_URL as keyof Object] ?? null;
 
 						if (url === urlOld) {
 							console.log(`Url: ${url}.\n Old url: ${urlOld}`);
 							continue;
 						}
 
-						let templateText = await this.getBaseTemplateText();
-						if (templateFile) {
-							templateText = await templateFile.text();
-						}
-						var template = Handlebars.compile(templateText);
-						let body = template({
+						let body = templateTab({
 							title: title,
 							date: new Date().toLocaleTimeString('en-us', {
 								weekday: 'long',
@@ -150,27 +213,29 @@ Description: {{description}}
 							}),
 							workspaceSectionTitleTag: workspaceSectionTitle.replace(' ', ''),
 							workspaceSubSectionTitleTag: workspaceSubSectionTitle.replace(' ', ''),
-							resourceSectionTitleTag: resourceSectionTitle.replace(' ', ''),
 							url: url,
-							description: description ?? 'Not provided',
 						});
 
-						// Delete the old version, if it exists
-						let exist = this.app.vault.getAbstractFileByPath(filename);
-						if (exist) {
-							if (!overwrite) {
-								new Notice(`Note already exists for '${filename}' - ignoring entry in data file`);
-								continue;
-							}
-							await this.app.vault.delete(exist).catch((err) => console.log(`app.vault.delete: ${err}`));
-						}
-						await this.app.vault
-							.create(filename, body)
-							.catch((err) => console.log(`Filename: ${filename}.\n app.vault.create: ${err}`));
+						await this.writeFile(body, filename, overwrite);
 					}
 				}
 			}
 		}
+	}
+
+	async writeFile(body: string, filename: string, overwrite: boolean) {
+		// Delete the old version, if it exists
+		let exist = this.app.vault.getAbstractFileByPath(filename);
+		if (exist) {
+			if (!overwrite) {
+				new Notice(`Note already exists for '${filename}' - ignoring entry in data file`);
+				return;
+			}
+			await this.app.vault.delete(exist).catch((err) => console.log(`app.vault.delete: ${err}`));
+		}
+		await this.app.vault
+			.create(filename, body)
+			.catch((err) => console.log(`Filename: ${filename}.\n app.vault.create: ${err}`));
 	}
 }
 
@@ -178,7 +243,9 @@ class WorkonaToObsidianSettingTab extends PluginSettingTab {
 	caller: Object;
 	handler: Function;
 	default_foldername: string;
-	default_overwrite: boolean;
+	default_resources: boolean = true;
+	default_tabs: boolean = false;
+	default_overwrite: boolean = true;
 	plugin: WorkonaToObsidian;
 
 	constructor(app: App, plugin: WorkonaToObsidian) {
@@ -194,6 +261,33 @@ class WorkonaToObsidianSettingTab extends PluginSettingTab {
 	setDefaults(foldername: string, overwrite: boolean) {
 		this.default_foldername = foldername;
 		this.default_overwrite = overwrite;
+	}
+
+	setCheckboxTemplate(containerEl: HTMLElement, item: string, isChecked: boolean = false) {
+		const checkboxSetting = new Setting(containerEl)
+			.setName(`Import ${item}`)
+			.setDesc(`When ticked, will import ${item} section`);
+		const inputField = checkboxSetting.controlEl.createEl('input', {
+			attr: {
+				type: 'checkbox',
+				checked: isChecked,
+			},
+		});
+		return inputField;
+	}
+
+	setTemplateFile(containerEl: HTMLElement, item: string) {
+		const templateSetting = new Setting(containerEl)
+			.setName(`Choose template ${item} Markdown file`)
+			.setDesc(`Choose template (Handlebars) Markdown file for ${item} section`);
+		const inputTemplateFile = templateSetting.controlEl.createEl('input', {
+			attr: {
+				type: 'file',
+				multiple: false,
+				accept: '.md',
+			},
+		});
+		return inputTemplateFile;
 	}
 
 	display(): void {
@@ -239,15 +333,30 @@ class WorkonaToObsidianSettingTab extends PluginSettingTab {
 			},
 		});
 
-		const templateSetting = new Setting(containerEl)
-			.setName('Choose template Markdown file')
-			.setDesc('Choose template (Handlebars) Markdown file');
-		const inputTemplateFile = templateSetting.controlEl.createEl('input', {
-			attr: {
-				type: 'file',
-				multiple: false,
-				accept: '.md',
-			},
+		const inputResourceField = this.setCheckboxTemplate(containerEl, 'Resources', this.default_resources);
+		const inputTemplateResourceFile = this.setTemplateFile(containerEl, 'Resources');
+
+		// Event listener for when the checkbox changes
+		inputResourceField.addEventListener('change', (e) => {
+			// If the checkbox is checked, show upload elements
+			if (e.target.checked) {
+				inputTemplateResourceFile.style.display = '';
+			} else {
+				inputTemplateResourceFile.style.display = 'none';
+			}
+		});
+
+		const inputTabField = this.setCheckboxTemplate(containerEl, 'Tabs', this.default_tabs);
+		const inputTemplateTabFile = this.setTemplateFile(containerEl, 'Tabs');
+
+		// Event listener for when the checkbox changes
+		inputTabField.addEventListener('change', (e) => {
+			// If the checkbox is checked, show upload elements
+			if (e.target.checked) {
+				inputTemplateTabFile.style.display = '';
+			} else {
+				inputTemplateTabFile.style.display = 'none';
+			}
 		});
 
 		const overwriteSetting = new Setting(containerEl)
@@ -277,10 +386,16 @@ class WorkonaToObsidianSettingTab extends PluginSettingTab {
 			.setDesc('Press to start the Import Process')
 			.addButton((button) =>
 				button.setButtonText('IMPORT').onClick(async (value) => {
-					const templateFiles = inputTemplateFile.files;
-					let templateFile = null;
-					if (templateFiles) {
-						templateFile = templateFiles[0];
+					const templateResourceFiles = inputTemplateResourceFile.files;
+					let templateResourceFile = null;
+					if (templateResourceFiles) {
+						templateResourceFile = templateResourceFiles[0];
+					}
+
+					const templateTabFiles = inputTemplateTabFile.files;
+					let templateTabFile = null;
+					if (templateTabFiles) {
+						templateTabFile = templateTabFiles[0];
 					}
 
 					let objdataOld: Object = {};
@@ -312,7 +427,10 @@ class WorkonaToObsidianSettingTab extends PluginSettingTab {
 								this.caller,
 								objdata,
 								objdataOld,
-								templateFile,
+								inputResourceField.checked,
+								templateResourceFile,
+								inputTabField.checked,
+								templateTabFile,
 								inputFolderName.value,
 								inputOverwriteField.checked,
 							);
@@ -323,7 +441,10 @@ class WorkonaToObsidianSettingTab extends PluginSettingTab {
 							this.caller,
 							objdata,
 							objdataOld,
-							templateFile,
+							inputResourceField.checked,
+							templateResourceFile,
+							inputTabField.checked,
+							templateTabFile,
 							inputFolderName.value,
 							inputOverwriteField.checked,
 						);
