@@ -99,7 +99,16 @@ Source url: {{url}}
 `;
 	}
 
-	async generateNotes(objdata: Object, objdataOld: Object, isResource: boolean, templateResourceFile: File, isTab: boolean, templateTabFile: File, destFolder: string, overwrite: boolean) {
+	async generateNotes(
+		objdata: Object,
+		objdataOld: Object,
+		isResource: boolean,
+		templateResourceFile: File,
+		isTab: boolean,
+		templateTabFile: File,
+		destFolder: string,
+		overwrite: boolean,
+	) {
 		console.log(`generateNotes('${destFolder}', ovewrite='${overwrite}')`);
 
 		// Save current settings
@@ -142,7 +151,7 @@ Source url: {{url}}
 				if (isResource) {
 					const resourcesFolder = WORKONA_RESOURCES.charAt(0).toUpperCase() + WORKONA_RESOURCES.slice(1);
 					const resourcesPath = workspaceSubSectionPath + '/' + resourcesFolder;
-					await this.createFolder(resourcesPath)
+					await this.createFolder(resourcesPath);
 					let resourcesSectionOldBase = workspaceSubSectionOld[WORKONA_RESOURCES as keyof Object] ?? {};
 					for (let [key, resourcesSection] of Object.entries(workspaceSubSection[WORKONA_RESOURCES as keyof Object])) {
 						let resourcesSectionOld = resourcesSectionOldBase[key as keyof Object] ?? {};
@@ -187,7 +196,7 @@ Source url: {{url}}
 				if (isTab) {
 					const tabFolder = WORKONA_TABS.charAt(0).toUpperCase() + WORKONA_TABS.slice(1);
 					const tabPath = workspaceSubSectionPath + '/' + tabFolder;
-					await this.createFolder(tabPath)
+					await this.createFolder(tabPath);
 					let tabOldBase = workspaceSubSectionOld[WORKONA_TABS as keyof Object] ?? {};
 					for (let [key, tab] of Object.entries(workspaceSubSection[WORKONA_TABS as keyof Object])) {
 						let tabOld = tabOldBase[key as keyof Object] ?? {};
