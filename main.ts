@@ -3,18 +3,22 @@ import { App, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
 const Handlebars = require("handlebars");
 
 
-const WORKONA_USER = "User"
-const WORKONA_WORKSPACES = "Workspaces"
-const WORKONA_TITLE = "title"
-const WORKONA_TABS = "Tabs"
-const WORKONA_RESOURCES = "Resources"
-const WORKONA_DESCRIPTION = "description"
-const WORKONA_URL = "url"
-const WORKONA_ARCHIVED_WORKSPACES = "Archived Workspaces"
-const WORKONA_MY_TASKS = "My Tasks"
+const WORKONA_USER= "User"
+const WORKONA_WORKSPACES= "Workspaces"
+const WORKONA_ARCHIVED_WORKSPACES= "Archived Workspaces"
+const WORKONA_MY_TASKS= "My Tasks"
 
-const SET_FOLDER_NAME   = "folderName";
-const SET_OVERWRITE     = "overwrite";
+const WORKONA_TITLE= "title"
+const WORKONA_TABS= "tabs"
+const WORKONA_RESOURCES= "resources"
+const WORKONA_NOTES= "notes"
+const WORKONA_TASKS= "tasks"
+
+const WORKONA_DESCRIPTION= "description"
+const WORKONA_URL= "url"
+
+const SET_FOLDER_NAME= "folderName";
+const SET_OVERWRITE= "overwrite";
 
 interface WorkonaToObsidianSettings {
 	[SET_FOLDER_NAME]: string;
@@ -112,13 +116,13 @@ Description: {{description}}
 				const workspaceSubSectionPath = workspaceSectionPath + "/" + workspaceSubSectionTitle;
 				await this.createFolder(workspaceSubSectionPath);
 
-				let resourcesSectionOldBase = worspaceSubSectionOld[WORKONA_RESOURCES.toLowerCase() as keyof Object] ?? {};
-				for (let [key, resourcesSection] of Object.entries(worspaceSubSection[WORKONA_RESOURCES.toLowerCase() as keyof Object])) {
+				let resourcesSectionOldBase = worspaceSubSectionOld[WORKONA_RESOURCES as keyof Object] ?? {};
+				for (let [key, resourcesSection] of Object.entries(worspaceSubSection[WORKONA_RESOURCES as keyof Object])) {
 					let resourcesSectionOld = resourcesSectionOldBase[key as keyof Object] ?? {};
 					const resourceSectionTitle = resourcesSection[WORKONA_TITLE as keyof Object];
 
-					let resourceOldBase = resourcesSectionOld[WORKONA_RESOURCES.toLowerCase() as keyof Object] ?? {}
-					for (let [key, resource] of Object.entries(resourcesSection[WORKONA_RESOURCES.toLowerCase() as keyof Object])) {
+					let resourceOldBase = resourcesSectionOld[WORKONA_RESOURCES as keyof Object] ?? {}
+					for (let [key, resource] of Object.entries(resourcesSection[WORKONA_RESOURCES as keyof Object])) {
 						let resourceOld = resourceOldBase[key as keyof Object] ?? {};
 						const title = resource[WORKONA_TITLE as keyof Object];
 						const filename = workspaceSubSectionPath + "/" + this.validFilename(title) + ".md";
@@ -220,14 +224,14 @@ class WorkonaToObsidianSettingTab extends PluginSettingTab {
 			}
 		});
 
-		 const templateSetting = new Setting(containerEl).setName("Choose template Markdown file").setDesc("Choose template (Handlebars) Markdown file");
-		 const inputTemplateFile = templateSetting.controlEl.createEl("input", {
-			   attr: {
-				 type: "file",
-				 multiple: false,
-				 accept: ".md",
-			   }
-		 });
+		const templateSetting = new Setting(containerEl).setName("Choose template Markdown file").setDesc("Choose template (Handlebars) Markdown file");
+		const inputTemplateFile = templateSetting.controlEl.createEl("input", {
+			attr: {
+				type: "file",
+				multiple: false,
+				accept: ".md",
+			}
+		});
 	
 	    const overwriteSetting = new Setting(containerEl).setName("Overwrite existing Notes").setDesc("When ticked, existing Notes with a matching name will be overwritten by entries in the supplied JSON file. Otherwise will be ignored");
     	const inputOverwriteField = overwriteSetting.controlEl.createEl("input", {
