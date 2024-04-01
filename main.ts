@@ -329,6 +329,7 @@ class WorkonaToObsidianSettingTab extends PluginSettingTab {
 	default_foldername: string;
 	default_resources: boolean = true;
 	default_tabs: boolean = false;
+	default_notes: boolean = false;
 	default_overwrite: boolean = true;
 	plugin: WorkonaToObsidian;
 
@@ -351,7 +352,7 @@ class WorkonaToObsidianSettingTab extends PluginSettingTab {
 		const checkboxSetting = new Setting(containerEl)
 			.setName(`Import ${item}`)
 			.setDesc(`When ticked, will import ${item} section`);
-		const inputField = checkboxSetting.controlEl.createEl('input', {attr: { type: 'checkbox'}});
+		const inputField = checkboxSetting.controlEl.createEl('input', { attr: { type: 'checkbox' } });
 		inputField.checked = isChecked;
 		return inputField;
 	}
@@ -367,7 +368,7 @@ class WorkonaToObsidianSettingTab extends PluginSettingTab {
 				accept: '.md',
 			},
 		});
-		if (!isChecked){
+		if (!isChecked) {
 			templateSetting.settingEl.style.display = 'none';
 		}
 		return [templateSetting, inputTemplateFile];
@@ -417,7 +418,11 @@ class WorkonaToObsidianSettingTab extends PluginSettingTab {
 		});
 
 		const inputResourceField = this.setCheckboxTemplate(containerEl, 'Resources', this.default_resources);
-		const [ templateResourceSettings, inputTemplateResourceFile ] = this.setTemplateFile(containerEl, 'Resources', this.default_resources);
+		const [templateResourceSettings, inputTemplateResourceFile] = this.setTemplateFile(
+			containerEl,
+			'Resources',
+			this.default_resources,
+		);
 
 		// Event listener for when the checkbox changes
 		inputResourceField.addEventListener('change', (e) => {
@@ -430,7 +435,7 @@ class WorkonaToObsidianSettingTab extends PluginSettingTab {
 		});
 
 		const inputTabField = this.setCheckboxTemplate(containerEl, 'Tabs', this.default_tabs);
-		const [ templateTabSettings, inputTemplateTabFile ] = this.setTemplateFile(containerEl, 'Tabs', this.default_tabs);
+		const [templateTabSettings, inputTemplateTabFile] = this.setTemplateFile(containerEl, 'Tabs', this.default_tabs);
 
 		// Event listener for when the checkbox changes
 		inputTabField.addEventListener('change', (e) => {
@@ -441,17 +446,21 @@ class WorkonaToObsidianSettingTab extends PluginSettingTab {
 				templateTabSettings.settingEl.style.display = 'none';
 			}
 		});
-		
-		const inputNoteField = this.setCheckboxTemplate(containerEl, 'Notes', this.default_tabs);
-		const inputTemplateNoteFile = this.setTemplateFile(containerEl, 'Notes');
+
+		const inputNoteField = this.setCheckboxTemplate(containerEl, 'Notes', this.default_notes);
+		const [templateNoteSettings, inputTemplateNoteFile] = this.setTemplateFile(
+			containerEl,
+			'Notes',
+			this.default_notes,
+		);
 
 		// Event listener for when the checkbox changes
 		inputNoteField.addEventListener('change', (e) => {
 			// If the checkbox is checked, show upload elements
 			if (e.target.checked) {
-				inputTemplateNoteFile.style.display = '';
+				templateNoteSettings.settingEl.style.display = '';
 			} else {
-				inputTemplateNoteFile.style.display = 'none';
+				templateNoteSettings.settingEl.style.display = 'none';
 			}
 		});
 
@@ -493,7 +502,7 @@ class WorkonaToObsidianSettingTab extends PluginSettingTab {
 					if (templateTabFiles) {
 						templateTabFile = templateTabFiles[0];
 					}
-					
+
 					const templateNoteFiles = inputTemplateNoteFile.files;
 					let templateNoteFile = null;
 					if (templateNoteFiles) {
