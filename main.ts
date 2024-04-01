@@ -110,7 +110,7 @@ tags: Workona, {{workspaceSectionTitleTag}}, {{workspaceSubSectionTitleTag}}, {{
 
 # {{title}}
 
-{{note}}
+{{description}}
 
 ---
 Attachments:
@@ -295,7 +295,7 @@ Attachments:
 								workspaceSectionTitleTag: workspaceSectionTitle.replace(' ', ''),
 								workspaceSubSectionTitleTag: workspaceSubSectionTitle.replace(' ', ''),
 								noteSectionTitleTag: noteSectionTitle.replace(' ', ''),
-								note: lines.join('\n'),
+								description: lines.join('\n'),
 								attachments: attachments,
 							});
 
