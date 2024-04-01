@@ -142,7 +142,8 @@ Note: **attachments** is an array of objects with **title** and **url** componen
 **[0.2.2]** - Prettify code with linter.  
 **[0.3.0]** - Added ability to import Tabs. Refactored folder structure. Now resources are under `Resources` folder, tabs - under `Tabs`.  
 **[0.3.1]** - Added ability to import Notes under `Notes` folder.  
-**[0.3.2]** - Added ability to import Tasks under `Tasks` folder.
+**[0.3.2]** - Added ability to import Tasks under `Tasks` folder.  
+**[0.3.3]** - Fixed empty files field.
 
 ## Note
 
