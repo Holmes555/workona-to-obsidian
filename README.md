@@ -7,8 +7,8 @@
 
 ## Instructions
 
-This plugin allow you to import all the resources, tabs and notes from you Workona generated JSON file. 
-It will create the same folder structure as in your workspaces, having resource, tab and note sections.
+This plugin allow you to import all the resources, tabs, notes and tasks from you Workona generated JSON file. 
+It will create the same folder structure as in your workspaces, having resource, tab, note and task sections.
 
 ## Handlebars
 
@@ -91,6 +91,36 @@ If you are specifying your own template, you could choose from these variables:
 Note: **attachments** is an array of objects with **title** and **url** components
 </details>
 
+<details>
+<summary>Task</summary>
+
+Default template:
+```md
+---
+date created: {{date}}
+date modified: {{date}}
+tags: Workona, {{workspaceSectionTitleTag}}, {{workspaceSubSectionTitleTag}}, {{taskSectionTitleTag}}
+---
+
+# {{title}}
+
+{{description}}
+
+---
+Attachments:
+{{#each attachments}}
+- [{{title}}]({{url}})
+
+{{/each}}
+```
+
+If you are specifying your own template, you could choose from these variables:
+```
+[title, date, workspaceSectionTitleTag, workspaceSubSectionTitleTag, taskSectionTitleTag, description, attachments]
+```
+Note: **attachments** is an array of objects with **title** and **url** components
+</details>
+
 ## How to use
 
 - Install it through community plugins
@@ -111,12 +141,12 @@ Note: **attachments** is an array of objects with **title** and **url** componen
 **[0.2.1]** - Updated name to "Workona Import" due to Obsidian developer policies [issue](https://github.com/Holmes555/workona-to-obsidian/issues/1).  
 **[0.2.2]** - Prettify code with linter.  
 **[0.3.0]** - Added ability to import Tabs. Refactored folder structure. Now resources are under `Resources` folder, tabs - under `Tabs`.  
-**[0.3.1]** - Added ability to import Notes under `Notes` folder.
+**[0.3.1]** - Added ability to import Notes under `Notes` folder.  
+**[0.3.2]** - Added ability to import Tasks under `Tasks` folder.
 
 ## Note
 
-Workona To Obsidian is still in early stage as I'm doing it on my free time for my use. 
-On this stage it will only import resources, tabs and notes, but I'm planning to add tasks transfer as well.
+Workona To Obsidian plugin is still evolving as I'm doing it on my free time for my use. 
 
 If you want to support me: [ko-fi](https://ko-fi.com/holmes555) or directly to [PayPal](https://paypal.me/holmes555)
 

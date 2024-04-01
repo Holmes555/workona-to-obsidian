@@ -1,7 +1,7 @@
 {
 	"name": "workona-to-obsidian-plugin",
-	"version": "0.3.1",
-	"description": "Import Workona resources through generated JSON file. (https://github.com/Holmes555/workona-to-obsidian)",
+	"version": "0.3.2",
+	"description": "Import Workona resources, tabs, notes and tasks through generated JSON file. (https://github.com/Holmes555/workona-to-obsidian)",
 	"main": "main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",

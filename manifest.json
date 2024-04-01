@@ -1,9 +1,9 @@
 {
 	"id": "workona-to-obsidian",
 	"name": "Workona Import",
-	"version": "0.3.1",
+	"version": "0.3.2",
 	"minAppVersion": "0.15.0",
-	"description": "Import Workona resources through generated JSON file.",
+	"description": "Import Workona resources, tabs, notes and tasks through generated JSON file.",
 	"author": "Holmes555",
 	"authorUrl": "https://github.com/Holmes555",
 	"isDesktopOnly": true

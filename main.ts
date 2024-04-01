@@ -121,6 +121,26 @@ Attachments:
 `;
 	}
 
+	async getTaskTemplateText() {
+		return `---
+date created: {{date}}
+date modified: {{date}}
+tags: Workona, {{workspaceSectionTitleTag}}, {{workspaceSubSectionTitleTag}}, {{taskSectionTitleTag}}
+---
+
+# {{title}}
+
+{{description}}
+
+---
+Attachments:
+{{#each attachments}}
+- [{{title}}]({{url}})
+
+{{/each}}
+`;
+	}
+
 	async generateNotes(
 		objdata: Object,
 		objdataOld: Object,
@@ -130,6 +150,8 @@ Attachments:
 		templateTabFile: File,
 		isNote: boolean,
 		templateNoteFile: File,
+		isTask: boolean,
+		templateTaskFile: File,
 		destFolder: string,
 		overwrite: boolean,
 	) {
@@ -161,6 +183,12 @@ Attachments:
 			templateNoteText = await templateNoteFile.text();
 		}
 		var templateNote = Handlebars.compile(templateNoteText);
+
+		let templateTaskText = await this.getTaskTemplateText();
+		if (templateTaskFile) {
+			templateTaskText = await templateTaskFile.text();
+		}
+		var templateTask = Handlebars.compile(templateTaskText);
 
 		let workspaceSectionOldBase = objdataOld[WORKONA_WORKSPACES as keyof Object] ?? {};
 		for (let [key, workspaceSection] of Object.entries(objdata[WORKONA_WORKSPACES as keyof Object])) {
@@ -303,6 +331,51 @@ Attachments:
 						}
 					}
 				}
+
+				if (isTask) {
+					const tasksFolder = WORKONA_TASKS.charAt(0).toUpperCase() + WORKONA_TASKS.slice(1);
+					const tasksPath = workspaceSubSectionPath + '/' + tasksFolder;
+					await this.createFolder(tasksPath);
+					let tasksSectionOldBase = workspaceSubSectionOld[WORKONA_TASKS as keyof Object] ?? {};
+					for (let [key, tasksSection] of Object.entries(workspaceSubSection[WORKONA_TASKS as keyof Object])) {
+						let tasksSectionOld = tasksSectionOldBase[key as keyof Object] ?? {};
+						const taskSectionTitle = tasksSection[WORKONA_TITLE as keyof Object];
+
+						let taskOldBase = tasksSectionOld[WORKONA_TASKS as keyof Object] ?? {};
+						for (let [key, task] of Object.entries(tasksSection[WORKONA_TASKS as keyof Object])) {
+							let taskOld = taskOldBase[key as keyof Object] ?? {};
+							const title = task[WORKONA_TITLE as keyof Object];
+							const titleOld = taskOld[WORKONA_TITLE as keyof Object] ?? null;
+							const filename = tasksPath + '/' + this.validFilename(title) + '.md';
+
+							const lines = task[WORKONA_DESCRIPTION as keyof Object][WORKONA_LINES as keyof Object];
+							const attachments = task[WORKONA_ATTACHMENTS as keyof Object];
+
+							if (title === titleOld) {
+								console.log(`Title: ${title}.\n Old title: ${titleOld}`);
+								continue;
+							}
+
+							let body = templateNote({
+								title: title,
+								date: new Date().toLocaleTimeString('en-us', {
+									weekday: 'long',
+									year: 'numeric',
+									month: 'short',
+									day: 'numeric',
+									hour12: false,
+								}),
+								workspaceSectionTitleTag: workspaceSectionTitle.replace(' ', ''),
+								workspaceSubSectionTitleTag: workspaceSubSectionTitle.replace(' ', ''),
+								taskSectionTitleTag: taskSectionTitle.replace(' ', ''),
+								description: lines.join('\n'),
+								attachments: attachments,
+							});
+
+							await this.writeFile(body, filename, overwrite);
+						}
+					}
+				}
 			}
 		}
 	}
@@ -330,6 +403,7 @@ class WorkonaToObsidianSettingTab extends PluginSettingTab {
 	default_resources: boolean = true;
 	default_tabs: boolean = false;
 	default_notes: boolean = false;
+	default_tasks: boolean = false;
 	default_overwrite: boolean = true;
 	plugin: WorkonaToObsidian;
 
@@ -464,6 +538,23 @@ class WorkonaToObsidianSettingTab extends PluginSettingTab {
 			}
 		});
 
+		const inputTaskField = this.setCheckboxTemplate(containerEl, 'Tasks', this.default_tasks);
+		const [templateTaskSettings, inputTemplateTaskFile] = this.setTemplateFile(
+			containerEl,
+			'Tasks',
+			this.default_tasks,
+		);
+
+		// Event listener for when the checkbox changes
+		inputTaskField.addEventListener('change', (e) => {
+			// If the checkbox is checked, show upload elements
+			if (e.target.checked) {
+				templateTaskSettings.settingEl.style.display = '';
+			} else {
+				templateTaskSettings.settingEl.style.display = 'none';
+			}
+		});
+
 		const overwriteSetting = new Setting(containerEl)
 			.setName('Overwrite existing Notes')
 			.setDesc(
@@ -509,6 +600,12 @@ class WorkonaToObsidianSettingTab extends PluginSettingTab {
 						templateNoteFile = templateNoteFiles[0];
 					}
 
+					const templateTaskFiles = inputTemplateTaskFile.files;
+					let templateTaskFile = null;
+					if (templateTaskFiles) {
+						templateTaskFile = templateTaskFiles[0];
+					}
+
 					let objdataOld: Object = {};
 					let textOld = inputOldJsonText.value;
 					if (textOld.length == 0) {
@@ -544,6 +641,8 @@ class WorkonaToObsidianSettingTab extends PluginSettingTab {
 								templateTabFile,
 								inputNoteField.checked,
 								templateNoteFile,
+								inputTaskField.checked,
+								templateTaskFile,
 								inputFolderName.value,
 								inputOverwriteField.checked,
 							);
@@ -560,6 +659,8 @@ class WorkonaToObsidianSettingTab extends PluginSettingTab {
 							templateTabFile,
 							inputNoteField.checked,
 							templateNoteFile,
+							inputTaskField.checked,
+							templateTaskFile,
 							inputFolderName.value,
 							inputOverwriteField.checked,
 						);
