@@ -166,29 +166,37 @@ Attachments:
 		const workspacesPath = destFolder + '/' + WORKONA_WORKSPACES;
 		await this.createFolder(workspacesPath);
 
-		let templateResourceText = await this.getResourceTemplateText();
-		if (templateResourceFile) {
-			templateResourceText = await templateResourceFile.text();
+		if (isResource) {
+			let templateResourceText = await this.getResourceTemplateText();
+			if (templateResourceFile) {
+				templateResourceText = await templateResourceFile.text();
+			}
+			var templateResource = Handlebars.compile(templateResourceText);
 		}
-		var templateResource = Handlebars.compile(templateResourceText);
 
-		let templateTabText = await this.getTabTemplateText();
-		if (templateTabFile) {
-			templateTabText = await templateTabFile.text();
+		if (isTab) {
+			let templateTabText = await this.getTabTemplateText();
+			if (templateTabFile) {
+				templateTabText = await templateTabFile.text();
+			}
+			var templateTab = Handlebars.compile(templateTabText);
 		}
-		var templateTab = Handlebars.compile(templateTabText);
 
-		let templateNoteText = await this.getNoteTemplateText();
-		if (templateNoteFile) {
-			templateNoteText = await templateNoteFile.text();
+		if (isNote) {
+			let templateNoteText = await this.getNoteTemplateText();
+			if (templateNoteFile) {
+				templateNoteText = await templateNoteFile.text();
+			}
+			var templateNote = Handlebars.compile(templateNoteText);
 		}
-		var templateNote = Handlebars.compile(templateNoteText);
 
-		let templateTaskText = await this.getTaskTemplateText();
-		if (templateTaskFile) {
-			templateTaskText = await templateTaskFile.text();
+		if (isTask) {
+			let templateTaskText = await this.getTaskTemplateText();
+			if (templateTaskFile) {
+				templateTaskText = await templateTaskFile.text();
+			}
+			var templateTask = Handlebars.compile(templateTaskText);
 		}
-		var templateTask = Handlebars.compile(templateTaskText);
 
 		let workspaceSectionOldBase = objdataOld[WORKONA_WORKSPACES as keyof Object] ?? {};
 		for (let [key, workspaceSection] of Object.entries(objdata[WORKONA_WORKSPACES as keyof Object])) {
@@ -356,7 +364,7 @@ Attachments:
 								continue;
 							}
 
-							let body = templateNote({
+							let body = templateTask({
 								title: title,
 								date: new Date().toLocaleTimeString('en-us', {
 									weekday: 'long',
@@ -612,9 +620,11 @@ class WorkonaToObsidianSettingTab extends PluginSettingTab {
 						const oldJsonFiles = inputOldJsonFile.files;
 						if (oldJsonFiles) {
 							let oldJsonFile = oldJsonFiles[0];
-							console.log(`Processing input old file ${oldJsonFile.name}`);
-							textOld = await oldJsonFile.text();
-							objdataOld = JSON.parse(textOld);
+							if (oldJsonFile) {
+								console.log(`Processing input old file ${oldJsonFile.name}`);
+								textOld = await oldJsonFile.text();
+								objdataOld = JSON.parse(textOld);
+							}
 						}
 					} else {
 						objdataOld = JSON.parse(textOld);
@@ -623,7 +633,7 @@ class WorkonaToObsidianSettingTab extends PluginSettingTab {
 					let text = inputJsonText.value;
 					if (text.length == 0) {
 						const jsonFiles = inputJsonFile.files;
-						if (!jsonFiles) {
+						if (!jsonFiles || !jsonFiles[0]) {
 							new Notice('No JSON file selected');
 							return;
 						}
