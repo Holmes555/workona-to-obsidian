@@ -276,16 +276,12 @@ class WorkonaToObsidianSettingTab extends PluginSettingTab {
 		const checkboxSetting = new Setting(containerEl)
 			.setName(`Import ${item}`)
 			.setDesc(`When ticked, will import ${item} section`);
-		const inputField = checkboxSetting.controlEl.createEl('input', {
-			attr: {
-				type: 'checkbox',
-				checked: isChecked,
-			},
-		});
+		const inputField = checkboxSetting.controlEl.createEl('input', {attr: { type: 'checkbox'}});
+		inputField.checked = isChecked;
 		return inputField;
 	}
 
-	setTemplateFile(containerEl: HTMLElement, item: string) {
+	setTemplateFile(containerEl: HTMLElement, item: string, isChecked: boolean = false) {
 		const templateSetting = new Setting(containerEl)
 			.setName(`Choose template ${item} Markdown file`)
 			.setDesc(`Choose template (Handlebars) Markdown file for ${item} section`);
@@ -296,7 +292,10 @@ class WorkonaToObsidianSettingTab extends PluginSettingTab {
 				accept: '.md',
 			},
 		});
-		return inputTemplateFile;
+		if (!isChecked){
+			templateSetting.settingEl.style.display = 'none';
+		}
+		return [templateSetting, inputTemplateFile];
 	}
 
 	display(): void {
@@ -343,28 +342,28 @@ class WorkonaToObsidianSettingTab extends PluginSettingTab {
 		});
 
 		const inputResourceField = this.setCheckboxTemplate(containerEl, 'Resources', this.default_resources);
-		const inputTemplateResourceFile = this.setTemplateFile(containerEl, 'Resources');
+		const [ templateResourceSettings, inputTemplateResourceFile ] = this.setTemplateFile(containerEl, 'Resources', this.default_resources);
 
 		// Event listener for when the checkbox changes
 		inputResourceField.addEventListener('change', (e) => {
 			// If the checkbox is checked, show upload elements
 			if (e.target.checked) {
-				inputTemplateResourceFile.style.display = '';
+				templateResourceSettings.settingEl.style.display = '';
 			} else {
-				inputTemplateResourceFile.style.display = 'none';
+				templateResourceSettings.settingEl.style.display = 'none';
 			}
 		});
 
 		const inputTabField = this.setCheckboxTemplate(containerEl, 'Tabs', this.default_tabs);
-		const inputTemplateTabFile = this.setTemplateFile(containerEl, 'Tabs');
+		const [ templateTabSettings, inputTemplateTabFile ] = this.setTemplateFile(containerEl, 'Tabs', this.default_tabs);
 
 		// Event listener for when the checkbox changes
 		inputTabField.addEventListener('change', (e) => {
 			// If the checkbox is checked, show upload elements
 			if (e.target.checked) {
-				inputTemplateTabFile.style.display = '';
+				templateTabSettings.settingEl.style.display = '';
 			} else {
-				inputTemplateTabFile.style.display = 'none';
+				templateTabSettings.settingEl.style.display = 'none';
 			}
 		});
 
