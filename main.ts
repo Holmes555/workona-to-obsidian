@@ -183,7 +183,7 @@ Attachments:
 			templateNoteText = await templateNoteFile.text();
 		}
 		var templateNote = Handlebars.compile(templateNoteText);
-		
+
 		let templateTaskText = await this.getTaskTemplateText();
 		if (templateTaskFile) {
 			templateTaskText = await templateTaskFile.text();
@@ -331,7 +331,7 @@ Attachments:
 						}
 					}
 				}
-				
+
 				if (isTask) {
 					const tasksFolder = WORKONA_TASKS.charAt(0).toUpperCase() + WORKONA_TASKS.slice(1);
 					const tasksPath = workspaceSubSectionPath + '/' + tasksFolder;
@@ -403,6 +403,7 @@ class WorkonaToObsidianSettingTab extends PluginSettingTab {
 	default_resources: boolean = true;
 	default_tabs: boolean = false;
 	default_notes: boolean = false;
+	default_tasks: boolean = false;
 	default_overwrite: boolean = true;
 	plugin: WorkonaToObsidian;
 
@@ -536,17 +537,21 @@ class WorkonaToObsidianSettingTab extends PluginSettingTab {
 				templateNoteSettings.settingEl.style.display = 'none';
 			}
 		});
-		
-		const inputTaskField = this.setCheckboxTemplate(containerEl, 'Tasks', this.default_tabs);
-		const inputTemplateTaskFile = this.setTemplateFile(containerEl, 'Tasks');
+
+		const inputTaskField = this.setCheckboxTemplate(containerEl, 'Tasks', this.default_tasks);
+		const [templateTaskSettings, inputTemplateTaskFile] = this.setTemplateFile(
+			containerEl,
+			'Tasks',
+			this.default_tasks,
+		);
 
 		// Event listener for when the checkbox changes
 		inputTaskField.addEventListener('change', (e) => {
 			// If the checkbox is checked, show upload elements
 			if (e.target.checked) {
-				inputTemplateTaskFile.style.display = '';
+				templateTaskSettings.settingEl.style.display = '';
 			} else {
-				inputTemplateTaskFile.style.display = 'none';
+				templateTaskSettings.settingEl.style.display = 'none';
 			}
 		});
 
@@ -594,7 +599,7 @@ class WorkonaToObsidianSettingTab extends PluginSettingTab {
 					if (templateNoteFiles) {
 						templateNoteFile = templateNoteFiles[0];
 					}
-					
+
 					const templateTaskFiles = inputTemplateTaskFile.files;
 					let templateTaskFile = null;
 					if (templateTaskFiles) {
