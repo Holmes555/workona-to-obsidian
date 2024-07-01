@@ -18,7 +18,7 @@
 		"handlebars": "latest",
 		"obsidian": "latest",
 		"tslib": "2.6.2",
-		"typescript": "5.4.5"
+		"typescript": "5.5.3"
 	},
 	"devDependencies": {
 		"prettier": "^3.2.5",
