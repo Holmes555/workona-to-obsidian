@@ -14,7 +14,7 @@
 	"dependencies": {
 		"@types/node": "^20.12.7",
 		"builtin-modules": "4.0.0",
-		"esbuild": "0.20.2",
+		"esbuild": "0.23.0",
 		"handlebars": "latest",
 		"obsidian": "latest",
 		"tslib": "2.6.2",
