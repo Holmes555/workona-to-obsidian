@@ -10,6 +10,8 @@
 This plugin allow you to import all the resources, tabs, notes and tasks from you Workona generated JSON file. 
 It will create the same folder structure as in your workspaces, having resource, tab, note and task sections.
 
+![workona-to-obsidian.gif](resources/workona-to-obsidian.gif)
+
 ## Handlebars
 
 For each item it will create a new .md file which implements provided by you or default Handlebars template.
